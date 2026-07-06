@@ -1,0 +1,9 @@
+# Allure reports
+
+allure-report-static/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
