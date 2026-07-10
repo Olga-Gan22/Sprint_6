@@ -10,7 +10,7 @@ ORDER_DATA_SET_1 = {
     "metro": "Охотный Ряд",
     "phone": "89205537695",
     "date": "25.07.2026",
-    "rent_period_text": "1 день",
+    "rent_period": "сутки",
     "color_black": True,      # заказываем чёрный
     "color_grey": False,       # серый НЕ заказываем
     "comment": "Оставьте у консьержа"
@@ -23,7 +23,7 @@ ORDER_DATA_SET_2 = {
     "metro": "Спортивная",
     "phone": "89991234567",
     "date": "30.07.2026",
-    "rent_period_text": "2 дня",
+    "rent_period": "двое суток",
     "color_black": False,      # чёрный НЕ заказываем
     "color_grey": True,        # заказываем серый
     "comment": ""
