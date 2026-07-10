@@ -4,6 +4,7 @@ import pytest
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from webdriver_manager.firefox import GeckoDriverManager
+from data.config import BASE_URL
 
 @pytest.fixture(scope="function")
 def driver():
@@ -11,5 +12,7 @@ def driver():
     service = FirefoxService(executable_path=GeckoDriverManager().install())
     driver = webdriver.Firefox(service=service, options=options)
     driver.maximize_window()
+
+    driver.get(BASE_URL)
     yield driver
     driver.quit()
