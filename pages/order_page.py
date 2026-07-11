@@ -69,10 +69,6 @@ class OrderPage(BasePage):
                 lambda d: date_input.get_attribute("value") != "",
                 message="Поле даты не приняло значение после ввода"
             )
-
-        # ВАЖНО: НЕ пытаемся закрыть календарь скриптом.
-        # Мы ждём, что приложение само закроет календарь при клике вне его.
-        # Если этого не происходит (баг тренажёра) — тест должен упасть.
         wait_calendar_close = WebDriverWait(self.driver, 10)
         wait_calendar_close.until(
             lambda d: len(d.find_elements(By.CSS_SELECTOR, ".react-datepicker-popper")) == 0,
@@ -82,13 +78,8 @@ class OrderPage(BasePage):
         # 2. Срок аренды
         dropdown = self.wait_for_clickable(OrderPageLocators.DROPDOWN_RENT_PERIOD)
         self.scroll_into_view(OrderPageLocators.DROPDOWN_RENT_PERIOD)
-
-        # JS-клик по контролу дропдауна.
-        # Если из-за неперекрытого календаря клик не сработает — будет ElementClickInterceptedException.
-        # Это тоже честный провал теста.
         self.driver.execute_script("arguments[0].click();", dropdown)
 
-        # Ждём появления опций
         options_locator = OrderPageLocators.RENT_PERIOD_OPTIONS_LIST
         wait_opts = WebDriverWait(self.driver, 15)
         wait_opts.until(
@@ -174,7 +165,6 @@ class OrderPage(BasePage):
 
         wait = WebDriverWait(self.driver, 15)
 
-        # Ждём появления новой вкладки
         wait.until(
             lambda d: len(d.window_handles) > 1,
             message="Не появилась новая вкладка после клика по логотипу Яндекса"
@@ -188,14 +178,10 @@ class OrderPage(BasePage):
 
         assert new_window is not None, "Не найдена новая вкладка"
         self.driver.switch_to.window(new_window)
-
-        # ИСПРАВЛЕНИЕ: ждём dzen.ru. Это сработает и для dzen.ru/?yredirect=true,
-        # и для sso.dzen.ru, и для любых других поддоменов Дзена.
         wait.until(
             lambda d: "dzen.ru" in d.current_url,
             message=f"Ожидался URL с dzen.ru, но получен: {self.driver.current_url}"
         )
-
         return original_window
 
 
