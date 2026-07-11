@@ -28,12 +28,18 @@ class OrderPageLocators:
 
 
     # --- Вторая форма ---
-    INPUT_DATE = (By.CSS_SELECTOR, ".react-datepicker__input-container input")
+     # Поле даты (оставляем как было)
+    INPUT_DATE = (By.CSS_SELECTOR, "input[placeholder*='Когда привезти самокат']")
+
+    # Дропдаун «Срок аренды» (контрол, по которому кликаем)
     DROPDOWN_RENT_PERIOD = (By.CSS_SELECTOR, ".Dropdown-control")
-    RENT_PERIOD_OPTIONS_LIST = (By.CSS_SELECTOR, ".Dropdown-menu .Dropdown-option") 
-    CHECKBOX_BLACK = (By.CSS_SELECTOR, "#black")
-    CHECKBOX_GREY = (By.CSS_SELECTOR, "#grey")
-    INPUT_COMMENT = (By.CSS_SELECTOR, "input[placeholder='Комментарий для курьера']")
+
+    # Опции в списке (все пункты «сутки», «двое суток» и т.д.)
+    RENT_PERIOD_OPTIONS_LIST = (By.CSS_SELECTOR, ".Dropdown-option[role='option']")
+
+    CHECKBOX_BLACK = (By.CSS_SELECTOR, "[name='colorBlack']")
+    CHECKBOX_GREY = (By.CSS_SELECTOR, "[name='colorGrey']")
+    INPUT_COMMENT = (By.CSS_SELECTOR, "textarea[placeholder*='Комментарий']")
     BTN_ORDER_FINAL = (By.CSS_SELECTOR, ".Order_Buttons__1xGrp button:not(.Button_Inverted__3IF-i)")
     CALENDAR_POPPER = (By.CSS_SELECTOR, ".react-datepicker__popper")
 
