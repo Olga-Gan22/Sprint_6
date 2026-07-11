@@ -28,13 +28,8 @@ class OrderPageLocators:
 
 
     # --- Вторая форма ---
-     # Поле даты (оставляем как было)
     INPUT_DATE = (By.CSS_SELECTOR, "input[placeholder*='Когда привезти самокат']")
-
-    # Дропдаун «Срок аренды» (контрол, по которому кликаем)
     DROPDOWN_RENT_PERIOD = (By.CSS_SELECTOR, ".Dropdown-control")
-
-    # Опции в списке (все пункты «сутки», «двое суток» и т.д.)
     RENT_PERIOD_OPTIONS_LIST = (By.CSS_SELECTOR, ".Dropdown-option[role='option']")
 
     CHECKBOX_BLACK = (By.CSS_SELECTOR, "[name='colorBlack']")

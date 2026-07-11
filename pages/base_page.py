@@ -18,10 +18,6 @@ class BasePage:
 
     @allure.step("Находим элемент по локатору: {locator}")
     def find_element(self, locator):
-        """
-        Возвращает элемент. Если не найден — падает с TimeoutException.
-        Никаких try/except, чтобы баг был виден сразу.
-        """
         return self.wait.until(
             EC.presence_of_element_located(locator),
             message=f"Элемент не найден по локатору: {locator}"
@@ -83,10 +79,6 @@ class BasePage:
                 f"Ожидался URL, заканчивающийся на '{path}', но текущий URL: '{self.driver.current_url}'"
             )
 
-    # УДАЛЁН: is_element_visible с возвратом False. 
-    # Если нужно проверить наличие элемента для логики — используй find_element.
-    # Если элемент не нужен для сценария — не проверяй его.
-    # Для тестов всегда лучше: "элемент должен быть" -> wait_for_visible, иначе падение.
 
     @allure.step("Ждём видимости всех элементов по локатору: {locator} (таймаут: {custom_timeout})")
     def wait_for_elements_visible(self, locator, custom_timeout=None):
