@@ -58,7 +58,6 @@ class BasePage:
 
     @allure.step("Прокручиваем страницу, чтобы элемент по локатору {locator} стал видимым")
     def scroll_into_view(self, locator):
-        # Сначала ждём, что элемент вообще есть в DOM, потом скроллим
         element = self.find_element(locator)
         self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
 
@@ -74,27 +73,20 @@ class BasePage:
         try:
             self.wait.until(lambda d: d.current_url.endswith(path))
         except TimeoutException:
-            # Честная ошибка: тест падает, и в отчёте Allure будет видно, какой URL был
             raise TimeoutException(
                 f"Ожидался URL, заканчивающийся на '{path}', но текущий URL: '{self.driver.current_url}'"
             )
 
-
     @allure.step("Ждём видимости всех элементов по локатору: {locator} (таймаут: {custom_timeout})")
     def wait_for_elements_visible(self, locator, custom_timeout=None):
-        timeout = custom_timeout if custom_timeout else self.wait._timeout
+        timeout = custom_timeout if custom_timeout is not None else self.wait._timeout
         local_wait = WebDriverWait(self.driver, timeout)
-        try:
-            return local_wait.until(
-                EC.visibility_of_all_elements_located(locator),
-                message=f"Не найдены элементы по локатору {locator}"
-            )
-        except TimeoutException as e:
-            raise e
-
-    @allure.step("Плавно прокручиваем к элементу (center, smooth)")
-    def scroll_to_element(self, element):
-        self.driver.execute_script(
-            "arguments[0].scrollIntoView({block: 'center', behavior: 'smooth'});",
-            element
+        return local_wait.until(
+            EC.visibility_of_all_elements_located(locator),
+            message=f"Не найдены элементы по локатору {locator}"
         )
+
+    @allure.step("Прокручиваем страницу, чтобы элемент по локатору {locator} стал видимым")
+    def scroll_into_view(self, locator):
+        element = self.find_element(locator)
+        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
