@@ -3,24 +3,24 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from locators.locators import MainPageLocators, OrderPageLocators
 from .base_page import BasePage
-from allure import step
+import allure
 
 
-class OrderPage(BasePage):
-    def __init__(self, driver, base_url):
-        super().__init__(driver=driver, base_url=base_url, timeout=15)
+class OrderPage(BasePage):  
+    def __init__(self, driver, base_url, timeout=15):  
+        super().__init__(driver=driver, base_url=base_url, timeout=timeout)
 
-    @step("Открываем главную страницу")
+    @allure.step("Открываем главную страницу")
     def open_main(self):
         self.driver.get(self.base_url)
 
-    @step("Кликаем кнопку «Заказать» в шапке страницы")
+    @allure.step("Кликаем кнопку «Заказать» в шапке страницы")
     def click_order_button_from_main(self):
         btn = self.wait_for_clickable(MainPageLocators.BTN_ORDER_HEADER)
         btn.click()
         self.assert_url_ends_with("/order")
 
-    @step("Заполняем первую форму заказа: имя, фамилия, адрес, метро, телефон")
+    @allure.step("Заполняем первую форму заказа: имя, фамилия, адрес, метро, телефон")
     def fill_first_form(self, name, last_name, address, metro_station, phone):
         # Имя
         el = self.wait_for_visible(OrderPageLocators.INPUT_NAME)
@@ -51,12 +51,12 @@ class OrderPage(BasePage):
         el.clear()
         el.send_keys(phone)
 
-    @step("Нажимаем кнопку «Далее» для перехода ко второй форме")
+    @allure.step("Нажимаем кнопку «Далее» для перехода ко второй форме")
     def click_next(self):
         btn = self.wait_for_clickable(OrderPageLocators.BTN_NEXT)
         btn.click()
 
-    @step("Заполняем вторую форму: дата, срок аренды, цвет, комментарий")
+    @allure.step("Заполняем вторую форму: дата, срок аренды, цвет, комментарий")
     def fill_second_form(self, date_str, rent_period_text, color_black=False, color_grey=False, comment=""):
         # 1. Дата
         date_input = self.wait_for_clickable(OrderPageLocators.INPUT_DATE)
@@ -69,6 +69,7 @@ class OrderPage(BasePage):
                 lambda d: date_input.get_attribute("value") != "",
                 message="Поле даты не приняло значение после ввода"
             )
+        
         wait_calendar_close = WebDriverWait(self.driver, 10)
         wait_calendar_close.until(
             lambda d: len(d.find_elements(By.CSS_SELECTOR, ".react-datepicker-popper")) == 0,
@@ -122,21 +123,21 @@ class OrderPage(BasePage):
         if comment:
             comment_input.send_keys(comment)
 
-    @step("Нажимаем финальную кнопку «Заказать»")
+    @allure.step("Нажимаем финальную кнопку «Заказать»")
     def click_final_order(self):
         btn = self.wait_for_clickable(OrderPageLocators.BTN_ORDER_FINAL)
         btn.click()
 
-    @step("Ждём появления модального окна подтверждения заказа")
+    @allure.step("Ждём появления модального окна подтверждения заказа")
     def wait_for_modal_to_appear(self):
         return self.wait_for_visible(OrderPageLocators.MODAL_WINDOW)
 
-    @step("Клик по кнопке «Посмотреть статус» в модальном окне")
+    @allure.step("Клик по кнопке «Посмотреть статус» в модальном окне")
     def confirm_order_in_modal(self):
         btn_view = self.wait_for_clickable(OrderPageLocators.BTN_MODAL_VIEW_STATUS)
         btn_view.click()
 
-    @step("Ждём исчезновения модального окна")
+    @allure.step("Ждём исчезновения модального окна")
     def wait_for_modal_to_disappear(self, timeout=15):
         local_wait = WebDriverWait(self.driver, timeout)
         local_wait.until(
@@ -144,7 +145,7 @@ class OrderPage(BasePage):
             message="Модальное окно не закрылось после клика на «Посмотреть статус»"
         )
 
-    @step("Скроллим к кнопке «Заказать» внизу и кликаем по ней")
+    @allure.step("Скроллим к кнопке «Заказать» внизу и кликаем по ней")
     def click_order_button_from_footer(self):
         locator = MainPageLocators.BTN_ORDER_FOOTER
         self.scroll_into_view(locator)
@@ -152,12 +153,12 @@ class OrderPage(BasePage):
         btn.click()
         self.assert_url_ends_with("/order")
 
-    @step("Клик по логотипу «Самокат» в шапке (возврат на главную)")
+    @allure.step("Клик по логотипу «Самокат» в шапке (возврат на главную)")
     def click_logo(self):
         logo_link = self.wait_for_clickable(MainPageLocators.LINK_LOGO)
         logo_link.click()
 
-    @step("Клик по логотипу Яндекса (открытие в новой вкладке) и ожидание dzen.ru")
+    @allure.step("Клик по логотипу Яндекса (открытие в новой вкладке) и ожидание dzen.ru")
     def click_yandex_logo_and_switch_to_new_tab(self):
         original_window = self.driver.current_window_handle
         link = self.wait_for_clickable(MainPageLocators.LINK_LOGO_YANDEX)
@@ -184,15 +185,14 @@ class OrderPage(BasePage):
         )
         return original_window
 
-
-    @step("Проверяем, что мы на главной странице (валидируем URL)")
+    @allure.step("Проверяем, что мы на главной странице (валидируем URL)")
     def assert_on_main_page(self, expected_url=None):
         current_url = self.driver.current_url
         if expected_url is None:
             expected_url = self.base_url
         assert expected_url in current_url, f"Ожидался URL с {expected_url}, но получен: {current_url}"
 
-    @step("Выполняем полный поток заказа")
+    @allure.step("Выполняем полный поток заказа")
     def perform_full_order_flow(self, data):
         self.click_order_button_from_main()
         self.fill_first_form(
@@ -214,3 +214,9 @@ class OrderPage(BasePage):
         self.wait_for_modal_to_appear()
         self.confirm_order_in_modal()
         self.wait_for_modal_to_disappear()
+
+    @allure.step("Проверяем, что поле ввода имени отображается на странице")
+    def verify_name_input_is_visible(self):
+        from locators.locators import OrderPageLocators
+        element = self.wait_for_visible(OrderPageLocators.INPUT_NAME)
+        assert element.is_displayed(), "Поле ввода имени не отображается после перехода к форме заказа"
