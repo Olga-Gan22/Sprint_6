@@ -1,18 +1,6 @@
 import pytest
 import allure
 from data.faq_questions import FAQ_QUESTIONS
-from pages.faq_page import FaqPage
-
-
-@pytest.fixture
-def faq_page(driver):
-    page = FaqPage(driver)
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    import time
-    time.sleep(0.5) 
-    
-    return page
-
 
 @allure.feature("FAQ")
 @allure.story("Вопросы о важном")
