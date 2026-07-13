@@ -86,7 +86,31 @@ class BasePage:
             message=f"Не найдены элементы по локатору {locator}"
         )
 
-    @allure.step("Прокручиваем страницу, чтобы элемент по локатору {locator} стал видимым")
-    def scroll_into_view(self, locator):
-        element = self.find_element(locator)
-        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
+    @allure.step("Получаем handle текущего окна браузера")
+    @property
+    def current_window_handle(self):
+        return self.driver.current_window_handle
+
+    @allure.step("Получаем список handles всех открытых окон браузера")
+    @property
+    def window_handles(self):
+        return self.driver.window_handles
+
+    @allure.step("Получаем текущий URL страницы")
+    @property
+    def current_url(self):
+        return self.driver.current_url
+
+    @allure.step("Выполняем JS-скрипт: {script}")
+    def execute_script(self, script, *args):
+        return self.driver.execute_script(script, *args)
+
+    @allure.step("Ищем все элементы по локатору (By, value)")
+    def find_elements(self, by, value=None):
+        if value is None:
+            return self.driver.find_elements(*by)
+        return self.driver.find_elements(by, value)
+
+    @allure.step("Переключаемся на окно браузера по handle: {handle}")
+    def switch_to_window(self, handle):
+        self.driver.switch_to.window(handle)
