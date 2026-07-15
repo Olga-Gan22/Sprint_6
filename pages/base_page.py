@@ -59,13 +59,35 @@ class BasePage:
     @allure.step("Прокручиваем страницу, чтобы элемент по локатору {locator} стал видимым")
     def scroll_into_view(self, locator):
         element = self.find_element(locator)
-        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
+        self.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
 
-    @allure.step("Переключаемся на новое окно (исходное окно: {original_window})")
+    @allure.step("Получаем handle текущего окна браузера")
+    def get_current_window_handle(self):
+        return self.driver.current_window_handle
+
+    @allure.step("Получаем список handles всех открытых окон браузера")
+    def get_window_handles(self):
+        return self.driver.window_handles
+
+    @allure.step("Переключаемся на окно браузера по handle: {handle}")
+    def switch_to_window(self, handle):
+        self.driver.switch_to.window(handle)
+
+    @allure.step("Переключаемся на новую вкладку (не текущую: {original_window})")
     def switch_to_new_window(self, original_window):
-        WebDriverWait(self.driver, 10).until(lambda d: len(d.window_handles) > 1)
-        new_window = [w for w in self.driver.window_handles if w != original_window][-1]
-        self.driver.switch_to.window(new_window)
+        wait = WebDriverWait(self.driver, 10)
+        wait.until(lambda d: len(d.window_handles) > 1)
+
+        new_window = None
+        for h in self.get_window_handles():
+            if h != original_window:
+                new_window = h
+                break
+
+        if new_window is None:
+            raise TimeoutException("Не найдена новая вкладка после клика")
+
+        self.switch_to_window(new_window)
         return new_window
 
     @allure.step("Проверяем, что URL заканчивается на: {path}")
@@ -86,21 +108,6 @@ class BasePage:
             message=f"Не найдены элементы по локатору {locator}"
         )
 
-    @allure.step("Получаем handle текущего окна браузера")
-    @property
-    def current_window_handle(self):
-        return self.driver.current_window_handle
-
-    @allure.step("Получаем список handles всех открытых окон браузера")
-    @property
-    def window_handles(self):
-        return self.driver.window_handles
-
-    @allure.step("Получаем текущий URL страницы")
-    @property
-    def current_url(self):
-        return self.driver.current_url
-
     @allure.step("Выполняем JS-скрипт: {script}")
     def execute_script(self, script, *args):
         return self.driver.execute_script(script, *args)
@@ -111,6 +118,6 @@ class BasePage:
             return self.driver.find_elements(*by)
         return self.driver.find_elements(by, value)
 
-    @allure.step("Переключаемся на окно браузера по handle: {handle}")
-    def switch_to_window(self, handle):
-        self.driver.switch_to.window(handle)
+    @allure.step("Получаем текущий URL страницы")
+    def get_current_url(self):
+        return self.driver.current_url
