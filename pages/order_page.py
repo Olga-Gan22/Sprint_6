@@ -1,8 +1,8 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from locators.locators import MainPageLocators, OrderPageLocators
-from selenium.webdriver.support.wait import WebDriverWait
 from .base_page import BasePage
+from selenium.webdriver.support.wait import WebDriverWait
 import allure
 
 
@@ -18,7 +18,6 @@ class OrderPage(BasePage):
     def click_order_button_from_main(self):
         btn = self.wait_for_clickable(MainPageLocators.BTN_ORDER_HEADER)
         btn.click()
-        # Здесь нет assert_url_ends_with — проверка будет в тесте
 
     @allure.step("Заполняем первую форму заказа: имя, фамилия, адрес, метро, телефон")
     def fill_first_form(self, name, last_name, address, metro_station, phone):
@@ -127,7 +126,6 @@ class OrderPage(BasePage):
         self.scroll_into_view(locator)
         btn = self.wait_for_clickable(locator)
         btn.click()
-        # Здесь тоже нет assert_url_ends_with — проверка в тесте
 
     @allure.step("Клик по логотипу «Самокат» в шапке (возврат на главную)")
     def click_logo(self):
@@ -136,33 +134,30 @@ class OrderPage(BasePage):
 
     @allure.step("Клик по логотипу Яндекса (открытие в новой вкладке) и ожидание dzen.ru")
     def click_yandex_logo_and_switch_to_new_tab(self):
-        original_window = self.driver.current_window_handle
+        original_window = self.get_current_window_handle()
         link = self.wait_for_clickable(MainPageLocators.LINK_LOGO_YANDEX)
         link.click()
 
         wait = WebDriverWait(self.driver, 15)
-
-        # ИСПРАВЛЕНО: используем d.window_handles (список), а не self.window_handles()
         wait.until(
             lambda d: len(d.window_handles) > 1,
             message="Не появилась новая вкладка после клика по логотипу Яндекса"
         )
 
         new_window = None
-        for handle in self.driver.window_handles:
+        for handle in self.get_window_handles():
             if handle != original_window:
                 new_window = handle
                 break
 
         assert new_window is not None, "Не найдена новая вкладка"
-        self.driver.switch_to.window(new_window)
+        self.switch_to_window(new_window)
 
         wait.until(
-            lambda d: "dzen.ru" in d.current_url,
-            message=f"Ожидался URL с dzen.ru, но получен: {self.driver.current_url}"
+            lambda d: "dzen.ru" in self.get_current_url(),
+            message=f"Ожидался URL с dzen.ru, но получен: {self.get_current_url()}"
         )
         return original_window
-
 
     @allure.step("Выполняем полный поток заказа")
     def perform_full_order_flow(self, data):
@@ -190,5 +185,4 @@ class OrderPage(BasePage):
     @allure.step("Проверяем, что поле ввода имени отображается на странице")
     def verify_name_input_is_visible(self):
         element = self.wait_for_visible(OrderPageLocators.INPUT_NAME)
-        # Это не ассерт результата, а ожидание элемента — допустимо в Page
         return element.is_displayed()
