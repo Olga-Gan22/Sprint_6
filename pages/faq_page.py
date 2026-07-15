@@ -2,12 +2,23 @@ from allure_commons._allure import step
 from locators.locators import ScooterLocators
 from .base_page import BasePage
 
+
 class FaqPage(BasePage):
+
     @step("Открываем вопрос FAQ с индексом: {index}")
     def open_question(self, index: int):
-        locator = ScooterLocators.question_button(index)
-        self.scroll_into_view(locator)
-        self.click_element(locator)
+        btn_locator = ScooterLocators.question_button(index)
+        self.scroll_into_view(btn_locator)
+        self.click_element(
+            btn_locator,
+            message=f"Кнопка вопроса №{index} не стала кликабельной"
+        )
+
+        answer_panel_locator = ScooterLocators.answer_panel(index)
+        self.wait_for_visible(
+            answer_panel_locator,
+            message=f"Ответ на вопрос №{index} не появился после клика — возможно, баг тренажёра или неверный локатор"
+        )
 
     @step("Проверяем, раскрыт ли вопрос с индексом: {index} (возвращаем bool)")
     def is_question_expanded(self, index: int) -> bool:
@@ -25,8 +36,8 @@ class FaqPage(BasePage):
     @step("Получаем текст ответа для вопроса с индексом: {index}")
     def get_answer_text(self, index: int) -> str:
         locator = ScooterLocators.answer_panel(index)
-        panel = self.wait_for_visible(locator)
-        if panel is None:
-            return ""
+        panel = self.wait_for_visible(
+            locator,
+            message=f"Панель ответа №{index} не видна"
+        )
         return panel.text.strip()
-
